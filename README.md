@@ -1,8 +1,6 @@
 #  OSync — Sistema de Gestão de Ordens de Serviço (OS)
 
-> Uma plataforma moderna, robusta e intuitiva para gerenciamento completo de Ordens de Serviço, Clientes, Equipamentos e Estoque de Peças — com visual dark futurista, suporte a tema claro/escuro e animações fluidas.
-
----
+> Uma plataforma moderna, robusta e intuitiva para gerenciamento completo de Ordens de Serviço, Clientes, Equipamentos e Estoque de Peças!
 
 ##  Principais Funcionalidades
 
