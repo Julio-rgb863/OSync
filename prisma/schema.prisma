@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  role          String    @default("ATENDENTE") // ADMIN | TECNICO | ATENDENTE
+  ativo         Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  ordens      OrdemDeServico[] @relation("TecnicoRelation")
+  historicos  HistoricoOS[]
+  comentarios ComentarioOS[]
+  accounts    Account[]
+  sessions    Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Cliente {
+  id          String   @id @default(cuid())
+  nome        String
+  email       String?
+  telefone    String?
+  cpfCnpj     String?
+  endereco    String?
+  cidade      String?
+  estado      String?
+  cep         String?
+  observacoes String?
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  equipamentos Equipamento[]
+  ordens       OrdemDeServico[]
+}
+
+model Equipamento {
+  id          String   @id @default(cuid())
+  clienteId   String
+  tipo        String   @default("OUTRO") // COMPUTADOR | NOTEBOOK | IMPRESSORA | CELULAR | TABLET | MAQUINA | OUTRO
+  marca       String?
+  modelo      String?
+  numeroSerie String?
+  descricao   String?
+  senha       String?
+  acessorios  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cliente Cliente          @relation(fields: [clienteId], references: [id])
+  ordens  OrdemDeServico[]
+  fotos   AnexoEquipamento[]
+}
+
+model OrdemDeServico {
+  id                  String    @id @default(cuid())
+  numero              Int       @unique
+  clienteId           String
+  equipamentoId       String?
+  tecnicoId           String?
+  status              String    @default("ABERTA") // ABERTA | EM_ANDAMENTO | AGUARDANDO_PECA | CONCLUIDA | ENTREGUE | CANCELADA
+  prioridade          String    @default("MEDIA")  // BAIXA | MEDIA | ALTA | URGENTE
+  descricaoProblema   String
+  laudoTecnico        String?
+  observacoesInternas String?
+  valorServico        Float     @default(0)
+  valorPecas          Float     @default(0)
+  valorTotal          Float     @default(0)
+  aprovadoPeloCliente Boolean   @default(false)
+  dataAprovacao       DateTime?
+  assinaturaCliente   String?   // base64
+  dataPrazo           DateTime?
+  dataConclusao       DateTime?
+  dataEntrega         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  cliente     Cliente          @relation(fields: [clienteId], references: [id])
+  equipamento Equipamento?     @relation(fields: [equipamentoId], references: [id])
+  tecnico     User?            @relation("TecnicoRelation", fields: [tecnicoId], references: [id])
+  historicos  HistoricoOS[]
+  pecas       PecaOS[]
+  anexos      AnexoOS[]
+  comentarios ComentarioOS[]
+}
+
+model HistoricoOS {
+  id             String   @id @default(cuid())
+  osId           String
+  userId         String
+  statusAnterior String?
+  statusNovo     String?
+  observacao     String?
+  createdAt      DateTime @default(now())
+
+  os   OrdemDeServico @relation(fields: [osId], references: [id], onDelete: Cascade)
+  user User           @relation(fields: [userId], references: [id])
+}
+
+model ComentarioOS {
+  id        String   @id @default(cuid())
+  osId      String
+  userId    String
+  texto     String
+  interno   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  os   OrdemDeServico @relation(fields: [osId], references: [id], onDelete: Cascade)
+  user User           @relation(fields: [userId], references: [id])
+}
+
+model Peca {
+  id            String   @id @default(cuid())
+  nome          String
+  descricao     String?
+  codigo        String?  @unique
+  quantidade    Int      @default(0)
+  estoqueMinimo Int      @default(1)
+  precoCompra   Float    @default(0)
+  precoVenda    Float    @default(0)
+  fornecedor    String?
+  localizacao   String?
+  ativo         Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ordens PecaOS[]
+}
+
+model PecaOS {
+  id            String @id @default(cuid())
+  osId          String
+  pecaId        String
+  quantidade    Int    @default(1)
+  precoUnitario Float  @default(0)
+
+  os   OrdemDeServico @relation(fields: [osId], references: [id], onDelete: Cascade)
+  peca Peca           @relation(fields: [pecaId], references: [id])
+}
+
+model AnexoOS {
+  id        String   @id @default(cuid())
+  osId      String
+  url       String
+  nome      String
+  tipo      String
+  tamanho   Int?
+  createdAt DateTime @default(now())
+
+  os OrdemDeServico @relation(fields: [osId], references: [id], onDelete: Cascade)
+}
+
+model AnexoEquipamento {
+  id            String   @id @default(cuid())
+  equipamentoId String
+  url           String
+  nome          String
+  createdAt     DateTime @default(now())
+
+  equipamento Equipamento @relation(fields: [equipamentoId], references: [id], onDelete: Cascade)
+}
