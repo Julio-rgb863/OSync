@@ -19,7 +19,7 @@ const navItems = [
   { title: 'Ordens de Serviço', href: '/ordens', icon: FileText, roles: ['ADMIN', 'TECNICO', 'ATENDENTE'] },
   { title: 'Peças / Estoque', href: '/pecas', icon: Package, roles: ['ADMIN', 'TECNICO'] },
   { title: 'Usuários', href: '/usuarios', icon: UserCog, roles: ['ADMIN'] },
-  { title: 'Configurações', href: '/configuracoes', icon: Settings, roles: ['ADMIN'] },
+  { title: 'Configurações', href: '/configuracoes', icon: Settings, roles: ['ADMIN', 'TECNICO', 'ATENDENTE'] },
 ]
 
 interface SidebarProps {
