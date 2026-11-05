@@ -39,6 +39,13 @@
 
 ---
 
+## 🗄️ Arquitetura e Modelagem do Banco de Dados
+
+Consulte a documentação completa com diagrama ERD, dicionário de dados e regras de negócio em:  
+👉 [docs/DATABASE.md](docs/DATABASE.md)
+
+---
+
 ## 🚀 Como Executar o Projeto Localmente
 
 ### Pré-requisitos
@@ -49,7 +56,7 @@
 
 1. **Clone o repositório:**
    ```bash
-   git clone <URL_DO_REPOSITORIO>
+   git clone https://github.com/Julio-rgb863/OSync.git
    cd OSync
    ```
 
@@ -66,8 +73,7 @@
 
 4. **Prepare o banco de dados e dados iniciais:**
    ```bash
-   npx prisma generate
-   npx prisma db push
+   npm run db:push
    npm run db:seed
    ```
 
@@ -76,6 +82,18 @@
    npm run dev
    ```
    Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
+
+---
+
+## 🛠️ Comandos Úteis do Banco de Dados
+
+| Comando | Descrição |
+|---|---|
+| `npm run db:studio` | Abre a interface visual web do Prisma no navegador (`http://localhost:5555`) |
+| `npm run db:push` | Aplica alterações do `prisma/schema.prisma` no banco |
+| `npm run db:seed` | Popula o banco com clientes, equipamentos, OS e peças de teste |
+| `npm run db:reset` | Zera o banco e executa o seed novamente |
+| `npm run db:generate` | Regera os tipos TypeScript do Prisma Client |
 
 ---
 
