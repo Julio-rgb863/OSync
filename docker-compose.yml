@@ -1,0 +1,19 @@
+services:
+  osync:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: osync-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:/app/prisma/data/dev.db
+      - AUTH_SECRET=osync-enterprise-secret-key-prod-32chars
+      - NODE_ENV=production
+    volumes:
+      - osync_data:/app/prisma/data
+
+volumes:
+  osync_data:
+    driver: local

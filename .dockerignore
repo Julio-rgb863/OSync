@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.env
+.env.local
+.agents
+.claude
+.windsurf
+*.db
+*.db-journal
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+README.md
+docs
