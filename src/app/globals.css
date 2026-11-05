@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
 
 @layer base {
   :root {
@@ -58,12 +56,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Tabular figures for data tables and financial numbers */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Enterprise scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
@@ -75,16 +71,9 @@ body {
   background: hsl(var(--border));
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
-}
 
-/* Subtle enterprise shadow */
 .shadow-subtle {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.02);
-}
-.shadow-dropdown {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
 }
 .shadow-modal {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
