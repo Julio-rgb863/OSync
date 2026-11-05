@@ -1,58 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Eye, EyeOff, Wrench, ArrowRight, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Logo } from '@/components/shared/logo'
 
 const loginSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.string().email('E-mail corporativo inválido'),
   password: z.string().min(1, 'Senha obrigatória'),
 })
 type LoginFormData = z.infer<typeof loginSchema>
-
-interface Particle {
-  id: number
-  x: number
-  y: number
-  size: number
-  duration: number
-  delay: number
-}
-
-function Particles() {
-  const [particles, setParticles] = useState<Particle[]>([])
-
-  useEffect(() => {
-    const list: Particle[] = Array.from({ length: 25 }, (_, i) => ({
-      id: i,
-      x: ((i * 37) % 95) + 2,
-      y: ((i * 53) % 95) + 2,
-      size: (i % 3) + 2,
-      duration: 10 + (i % 10),
-      delay: (i % 5),
-    }))
-    setParticles(list)
-  }, [])
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((p) => (
-        <motion.div
-          key={p.id}
-          className="absolute rounded-full bg-indigo-500/20"
-          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
-          animate={{ y: [0, -30, 0], opacity: [0.2, 0.8, 0.2] }}
-          transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      ))}
-    </div>
-  )
-}
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -73,123 +34,137 @@ export default function LoginPage() {
         password: data.password,
         redirect: false,
       })
-      if (result?.error) setError('Email ou senha inválidos')
-      else { router.push('/dashboard'); router.refresh() }
+      if (result?.error) {
+        setError('Credenciais inválidas. Verifique seu e-mail e senha.')
+      } else {
+        router.push('/dashboard')
+        router.refresh()
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-50" />
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-      <div className="absolute top-3/4 left-1/3 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl" />
-      <Particles />
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-background flex flex-col items-center justify-center p-4 select-none">
+      <div className="w-full max-w-sm">
+        {/* Brand Header */}
+        <div className="flex flex-col items-center mb-6 text-center">
+          <Logo size={36} showWordmark={true} className="mb-2" />
+          <p className="text-xs text-muted-foreground">
+            Plataforma Corporativa de Gestão Integrada
+          </p>
+        </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md mx-4"
-      >
-        {/* Logo */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="text-center mb-8"
-        >
-          <motion.div
-            animate={{ boxShadow: ['0 0 20px rgba(99,102,241,0.3)', '0 0 60px rgba(99,102,241,0.6)', '0 0 20px rgba(99,102,241,0.3)'] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="inline-flex w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 items-center justify-center mb-4"
-          >
-            <Wrench className="w-8 h-8 text-white" />
-          </motion.div>
-          <h1 className="text-3xl font-bold gradient-text">OSync</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Sistema de Ordem de Serviço</p>
-        </motion.div>
-
-        {/* Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="glass rounded-2xl p-8"
-        >
-          <h2 className="text-xl font-semibold mb-6">Entrar na plataforma</h2>
+        {/* Enterprise Login Card */}
+        <div className="bg-card border border-border rounded-lg p-6 shadow-modal">
+          <div className="mb-5">
+            <h1 className="text-base font-semibold text-foreground tracking-tight">
+              Acessar sua conta
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Informe suas credenciais corporativas
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="text-xs text-muted-foreground mb-1.5 block">Email</label>
+              <label className="text-xs font-medium text-foreground block mb-1.5">
+                E-mail corporativo
+              </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   {...register('email')}
                   type="email"
-                  placeholder="seu@email.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  placeholder="nome@empresa.com"
+                  autoComplete="email"
+                  className="w-full pl-9 pr-3 py-2 rounded-md bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
                 />
               </div>
-              {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-[11px] text-destructive mt-1">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground mb-1.5 block">Senha</label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-medium text-foreground">
+                  Senha
+                </label>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
                   {...register('password')}
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 rounded-lg bg-muted border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  autoComplete="current-password"
+                  className="w-full pl-9 pr-9 py-2 rounded-md bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
               </div>
-              {errors.password && <p className="text-xs text-destructive mt-1">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-[11px] text-destructive mt-1">{errors.password.message}</p>
+              )}
             </div>
 
             {error && (
-              <motion.p
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2"
-              >
+              <div className="p-2.5 rounded-md text-xs text-destructive bg-destructive/10 border border-destructive/20 leading-relaxed">
                 {error}
-              </motion.p>
+              </div>
             )}
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 mt-2"
+              className="w-full py-2 px-4 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 shadow-subtle mt-1"
             >
               {loading ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-3.5 h-3.5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
               ) : (
-                <>Entrar <ArrowRight className="w-4 h-4" /></>
+                <>
+                  Entrar no sistema
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </>
               )}
-            </motion.button>
+            </button>
           </form>
 
-          {/* Demo credentials */}
-          <div className="mt-6 p-3 rounded-lg bg-muted/50 border border-border">
-            <p className="text-xs text-muted-foreground font-medium mb-1">✨ Credenciais de demonstração:</p>
-            <p className="text-xs text-muted-foreground">Email: <span className="text-foreground font-mono">admin@osync.com</span></p>
-            <p className="text-xs text-muted-foreground">Senha: <span className="text-foreground font-mono">admin123</span></p>
+          {/* Quick Demo Access Tray */}
+          <div className="mt-5 pt-4 border-t border-border">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+              Credenciais de Demonstração
+            </p>
+            <div className="space-y-1 text-xs text-muted-foreground bg-muted/40 p-2.5 rounded border border-border/60">
+              <div className="flex justify-between">
+                <span>Administrador:</span>
+                <span className="font-mono text-foreground">admin@osync.com / admin123</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Técnico:</span>
+                <span className="font-mono text-foreground">tecnico@osync.com / tecnico123</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Atendente:</span>
+                <span className="font-mono text-foreground">atendente@osync.com / atendente123</span>
+              </div>
+            </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+
+        {/* Global Footer Meta */}
+        <p className="text-center text-[11px] text-muted-foreground mt-4">
+          OSync Enterprise v1.0.0 · Ambiente Seguro & Criptografado
+        </p>
+      </div>
     </div>
   )
 }

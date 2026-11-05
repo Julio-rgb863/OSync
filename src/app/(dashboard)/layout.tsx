@@ -14,14 +14,14 @@ export default async function DashboardLayout({
   if (!session?.user) redirect('/login')
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="flex h-screen bg-[#F8FAFC] dark:bg-background overflow-hidden">
       <Sidebar
         userRole={(session.user as any).role}
         userName={session.user.name || 'Usuário'}
       />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-6 max-w-7xl w-full mx-auto">{children}</main>
       </div>
     </div>
   )

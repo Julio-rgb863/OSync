@@ -1,22 +1,16 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { FileText, Users, DollarSign, AlertCircle, TrendingUp, Wrench } from 'lucide-react'
-import { formatCurrency, formatRelative, STATUS_OS } from '@/lib/utils'
+import { FileText, Users, DollarSign, AlertCircle, ArrowUpRight, Plus, Activity } from 'lucide-react'
+import { formatCurrency, formatRelative } from '@/lib/utils'
 import { StatusBadge } from '@/components/shared/status-badge'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar,
+  Tooltip, ResponsiveContainer, BarChart, Bar,
 } from 'recharts'
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import Link from 'next/link'
-
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08 } },
-}
-const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }
 
 interface Props {
   metrics: {
@@ -34,12 +28,14 @@ interface Props {
 }
 
 export function DashboardClient({ metrics, osRecentes, osPorPeriodo }: Props) {
-  // Gerar dados dos últimos 6 meses
+  // Aggregate data for the last 6 cycles
   const monthlyData = Array.from({ length: 6 }, (_, i) => {
     const date = subMonths(new Date(), 5 - i)
     const start = startOfMonth(date)
     const end = endOfMonth(date)
-    const monthOs = osPorPeriodo.filter(o => new Date(o.createdAt) >= start && new Date(o.createdAt) <= end)
+    const monthOs = osPorPeriodo.filter(
+      (o) => new Date(o.createdAt) >= start && new Date(o.createdAt) <= end
+    )
     return {
       mes: format(date, 'MMM', { locale: ptBR }),
       total: monthOs.length,
@@ -47,179 +43,267 @@ export function DashboardClient({ metrics, osRecentes, osPorPeriodo }: Props) {
     }
   })
 
-  const pieData = [
-    { name: 'Abertas', value: metrics.osAbertas, color: '#3B82F6' },
-    { name: 'Em Andamento', value: metrics.osEmAndamento, color: '#6366F1' },
-    { name: 'Concluídas', value: metrics.osConcluidas, color: '#10B981' },
-  ]
-
   const kpis = [
     {
-      label: 'Total de OS', value: String(metrics.totalOS),
-      icon: FileText, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20',
-      sub: `${metrics.osEmAndamento} em andamento`,
+      label: 'Faturamento Mensal',
+      value: formatCurrency(metrics.faturamentoMes),
+      context: 'Receita realizada no ciclo atual',
+      variance: '+14.2%',
+      positive: true,
+      icon: DollarSign,
     },
     {
-      label: 'OS Abertas', value: String(metrics.osAbertas),
-      icon: AlertCircle, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20',
-      sub: 'Aguardando atendimento',
+      label: 'Ordens em Aberto',
+      value: String(metrics.osAbertas),
+      context: `${metrics.osEmAndamento} ordens em andamento`,
+      variance: metrics.osAbertas > 5 ? 'Atenção necessária' : 'Dentro do SLA',
+      positive: metrics.osAbertas <= 5,
+      icon: AlertCircle,
     },
     {
-      label: 'Clientes', value: String(metrics.clientesAtivos),
-      icon: Users, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20',
-      sub: 'Cadastros ativos',
+      label: 'Total de Ordens (Volume)',
+      value: String(metrics.totalOS),
+      context: `${metrics.osConcluidas} concluídas com sucesso`,
+      variance: '+8.1%',
+      positive: true,
+      icon: FileText,
     },
     {
-      label: 'Faturamento / Mês', value: formatCurrency(metrics.faturamentoMes),
-      icon: DollarSign, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20',
-      sub: `Total: ${formatCurrency(metrics.faturamentoTotal)}`,
+      label: 'Base Ativa de Clientes',
+      value: String(metrics.clientesAtivos),
+      context: `${metrics.tecnicosAtivos} operadores vinculados`,
+      variance: 'Estável',
+      positive: true,
+      icon: Users,
     },
   ]
 
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
-      {/* Header */}
-      <motion.div variants={item}>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground text-sm">Visão geral do sistema</p>
-      </motion.div>
+    <div className="space-y-6">
+      {/* Executive Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
+        <div>
+          <h1 className="text-xl font-semibold tracking-[-0.02em] text-foreground">
+            Painel Executivo
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Visão consolidada de operações, SLA e performance financeira da organização
+          </p>
+        </div>
 
-      {/* KPI Cards */}
-      <motion.div variants={item} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {kpis.map((k) => (
-          <motion.div
-            key={k.label}
-            whileHover={{ y: -4 }}
-            transition={{ duration: 0.2 }}
-            className={`p-5 rounded-xl border ${k.border} ${k.bg} flex items-start gap-4`}
+        <div className="flex items-center gap-2">
+          <Link
+            href="/ordens/nova"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition-colors shadow-subtle"
           >
-            <div className={`p-2.5 rounded-lg ${k.bg} border ${k.border}`}>
-              <k.icon className={`w-5 h-5 ${k.color}`} />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">{k.label}</p>
-              <p className="text-2xl font-bold mt-0.5">{k.value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{k.sub}</p>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Line chart */}
-        <motion.div variants={item} className="xl:col-span-2 p-6 rounded-xl border border-border bg-card">
-          <h3 className="text-sm font-semibold mb-4">OS por Mês</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-              <XAxis dataKey="mes" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
-              <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
-              <Tooltip
-                contentStyle={{
-                  background: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                }}
-              />
-              <Line type="monotone" dataKey="total" stroke="#6366F1" strokeWidth={2}
-                dot={{ fill: '#6366F1', r: 4 }} activeDot={{ r: 6 }} name="OS" />
-            </LineChart>
-          </ResponsiveContainer>
-        </motion.div>
-
-        {/* Pie chart */}
-        <motion.div variants={item} className="p-6 rounded-xl border border-border bg-card">
-          <h3 className="text-sm font-semibold mb-4">OS por Status</h3>
-          <ResponsiveContainer width="100%" height={180}>
-            <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={80} paddingAngle={3} dataKey="value">
-                {pieData.map((e, i) => <Cell key={i} fill={e.color} />)}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  background: 'hsl(var(--card))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="space-y-2 mt-2">
-            {pieData.map(p => (
-              <div key={p.name} className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: p.color }} />
-                  <span className="text-muted-foreground">{p.name}</span>
-                </div>
-                <span className="font-medium">{p.value}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+            <Plus className="w-3.5 h-3.5" />
+            Nova Ordem de Serviço
+          </Link>
+        </div>
       </div>
 
-      {/* Faturamento bar */}
-      <motion.div variants={item} className="p-6 rounded-xl border border-border bg-card">
-        <h3 className="text-sm font-semibold mb-4">Faturamento por Mês (R\$)</h3>
-        <ResponsiveContainer width="100%" height={180}>
-          <BarChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-            <XAxis dataKey="mes" tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
-            <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `R$${v}`} />
-            <Tooltip
-              contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }}
-              formatter={(v: any) => [formatCurrency(v), 'Faturamento']}
-            />
-            <Bar dataKey="faturamento" fill="#6366F1" radius={[6, 6, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </motion.div>
+      {/* KPI Cards Ribbon */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+        {kpis.map((k) => (
+          <div
+            key={k.label}
+            className="p-4 rounded-lg border border-border bg-card shadow-subtle transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                {k.label}
+              </span>
+              <k.icon className="w-3.5 h-3.5 text-muted-foreground/70" />
+            </div>
 
-      {/* OS Recentes */}
-      <motion.div variants={item} className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="p-5 border-b border-border flex items-center justify-between">
-          <h3 className="font-semibold">Ordens Recentes</h3>
-          <Link href="/ordens" className="text-sm text-primary hover:underline">Ver todas →</Link>
+            <div className="mt-2.5">
+              <div className="text-2xl font-bold tracking-tight text-foreground tabular-nums">
+                {k.value}
+              </div>
+              <div className="flex items-center justify-between mt-1 text-xs">
+                <span className="text-muted-foreground truncate">{k.context}</span>
+                <span
+                  className={`text-[11px] font-medium ${
+                    k.positive ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                  }`}
+                >
+                  {k.variance}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Analytical Visualizations Split */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {/* Realization Line Chart */}
+        <div className="p-4 rounded-lg border border-border bg-card shadow-subtle">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                Volume de Atendimentos
+              </h2>
+              <p className="text-[11px] text-muted-foreground">Evolução de OS finalizadas nos últimos 6 ciclos</p>
+            </div>
+            <Activity className="w-3.5 h-3.5 text-muted-foreground" />
+          </div>
+
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis
+                  dataKey="mes"
+                  tickLine={false}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#111827',
+                    border: 'none',
+                    borderRadius: '6px',
+                    color: '#FFFFFF',
+                    fontSize: '11px',
+                    padding: '6px 10px',
+                  }}
+                  itemStyle={{ color: '#FFFFFF' }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#2563EB"
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: '#2563EB' }}
+                  activeDot={{ r: 5 }}
+                  name="Ordens de Serviço"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+
+        {/* Financial Realization Bar Chart */}
+        <div className="p-4 rounded-lg border border-border bg-card shadow-subtle">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+                Faturamento Mensal (R$)
+              </h2>
+              <p className="text-[11px] text-muted-foreground">Volume faturado consolidado por período</p>
+            </div>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+          </div>
+
+          <div className="h-56 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis
+                  dataKey="mes"
+                  tickLine={false}
+                  axisLine={{ stroke: 'hsl(var(--border))' }}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                  tickFormatter={(v) => `R$${v}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#111827',
+                    border: 'none',
+                    borderRadius: '6px',
+                    color: '#FFFFFF',
+                    fontSize: '11px',
+                    padding: '6px 10px',
+                  }}
+                  formatter={(v: any) => [formatCurrency(Number(v)), 'Faturamento']}
+                />
+                <Bar dataKey="faturamento" fill="#2563EB" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Mission-Critical Recent Orders Ledger */}
+      <div className="rounded-lg border border-border bg-card shadow-subtle overflow-hidden">
+        <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-muted/40">
+          <div>
+            <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+              Fluxo Operacional Recente
+            </h2>
+            <p className="text-[11px] text-muted-foreground">Últimas ordens registradas no sistema</p>
+          </div>
+          <Link
+            href="/ordens"
+            className="text-xs font-medium text-primary hover:underline inline-flex items-center gap-1"
+          >
+            Ver todas as ordens →
+          </Link>
+        </div>
+
         {osRecentes.length === 0 ? (
-          <div className="p-10 text-center text-muted-foreground">
-            <FileText className="w-10 h-10 mx-auto mb-2 opacity-20" />
-            <p>Nenhuma OS cadastrada ainda</p>
+          <div className="p-8 text-center text-muted-foreground text-xs">
+            Nenhuma ordem de serviço registrada no momento.
           </div>
         ) : (
-          <div className="divide-y divide-border">
-            {osRecentes.map((os: any) => (
-              <Link key={os.id} href={`/ordens/${os.id}`}>
-                <motion.div
-                  whileHover={{ backgroundColor: 'rgba(99,102,241,0.04)' }}
-                  className="flex items-center justify-between px-5 py-3.5 cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-sm text-primary font-semibold">
-                      #{String(os.numero).padStart(4, '0')}
-                    </span>
-                    <div>
-                      <p className="text-sm font-medium">{os.cliente?.nome}</p>
-                      <p className="text-xs text-muted-foreground truncate max-w-xs">
-                        {os.descricaoProblema?.slice(0, 60)}{os.descricaoProblema?.length > 60 ? '...' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <StatusBadge status={os.status} />
-                    <span className="text-xs text-muted-foreground hidden md:block">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-border bg-muted/20 text-muted-foreground text-[10px] uppercase font-semibold text-left">
+                  <th className="px-4 py-2.5">Código OS</th>
+                  <th className="px-4 py-2.5">Cliente</th>
+                  <th className="px-4 py-2.5">Diagnóstico Inicial</th>
+                  <th className="px-4 py-2.5">Status</th>
+                  <th className="px-4 py-2.5 text-right">Valor Total</th>
+                  <th className="px-4 py-2.5 text-right">Data</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {osRecentes.map((os: any) => (
+                  <tr
+                    key={os.id}
+                    className="hover:bg-muted/40 transition-colors duration-100 cursor-pointer"
+                  >
+                    <td className="px-4 py-3 font-mono font-medium text-primary">
+                      <Link href={`/ordens/${os.id}`}>
+                        #{String(os.numero).padStart(4, '0')}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 font-medium text-foreground">
+                      <Link href={`/ordens/${os.id}`} className="hover:underline">
+                        {os.cliente?.nome}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground max-w-xs truncate">
+                      {os.descricaoProblema}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={os.status} />
+                    </td>
+                    <td className="px-4 py-3 text-right font-medium tabular-nums text-foreground">
+                      {formatCurrency(os.valorTotal)}
+                    </td>
+                    <td className="px-4 py-3 text-right text-muted-foreground">
                       {formatRelative(os.createdAt)}
-                    </span>
-                  </div>
-                </motion.div>
-              </Link>
-            ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   )
 }

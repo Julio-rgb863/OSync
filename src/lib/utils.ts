@@ -29,47 +29,67 @@ export function formatCurrency(value: number) {
 export const STATUS_OS = {
   ABERTA: {
     label: 'Aberta',
-    bg: 'bg-blue-500/20',
-    text: 'text-blue-400',
-    border: 'border-blue-500/30',
+    bg: 'bg-blue-50 dark:bg-blue-950/40',
+    text: 'text-blue-700 dark:text-blue-300',
+    border: 'border-blue-200 dark:border-blue-800/60',
   },
   EM_ANDAMENTO: {
     label: 'Em Andamento',
-    bg: 'bg-indigo-500/20',
-    text: 'text-indigo-400',
-    border: 'border-indigo-500/30',
+    bg: 'bg-slate-100 dark:bg-slate-800',
+    text: 'text-slate-700 dark:text-slate-300',
+    border: 'border-slate-200 dark:border-slate-700',
   },
   AGUARDANDO_PECA: {
     label: 'Aguardando Peça',
-    bg: 'bg-amber-500/20',
-    text: 'text-amber-400',
-    border: 'border-amber-500/30',
+    bg: 'bg-amber-50 dark:bg-amber-950/40',
+    text: 'text-amber-700 dark:text-amber-300',
+    border: 'border-amber-200 dark:border-amber-800/60',
   },
   CONCLUIDA: {
     label: 'Concluída',
-    bg: 'bg-emerald-500/20',
-    text: 'text-emerald-400',
-    border: 'border-emerald-500/30',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    text: 'text-emerald-700 dark:text-emerald-300',
+    border: 'border-emerald-200 dark:border-emerald-800/60',
   },
   ENTREGUE: {
     label: 'Entregue',
-    bg: 'bg-cyan-500/20',
-    text: 'text-cyan-400',
-    border: 'border-cyan-500/30',
+    bg: 'bg-teal-50 dark:bg-teal-950/40',
+    text: 'text-teal-700 dark:text-teal-300',
+    border: 'border-teal-200 dark:border-teal-800/60',
   },
   CANCELADA: {
     label: 'Cancelada',
-    bg: 'bg-red-500/20',
-    text: 'text-red-400',
-    border: 'border-red-500/30',
+    bg: 'bg-rose-50 dark:bg-rose-950/40',
+    text: 'text-rose-700 dark:text-rose-300',
+    border: 'border-rose-200 dark:border-rose-800/60',
   },
 }
 
 export const PRIORIDADE_OS = {
-  BAIXA: { label: 'Baixa', bg: 'bg-slate-500/20', text: 'text-slate-400' },
-  MEDIA: { label: 'Média', bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  ALTA: { label: 'Alta', bg: 'bg-orange-500/20', text: 'text-orange-400' },
-  URGENTE: { label: 'Urgente', bg: 'bg-red-500/20', text: 'text-red-400' },
+  BAIXA: {
+    label: 'Baixa',
+    bg: 'bg-slate-50 dark:bg-slate-900',
+    text: 'text-slate-600 dark:text-slate-400',
+    border: 'border-slate-200 dark:border-slate-800',
+  },
+  MEDIA: {
+    label: 'Média',
+    bg: 'bg-blue-50 dark:bg-blue-950/30',
+    text: 'text-blue-700 dark:text-blue-400',
+    border: 'border-blue-200 dark:border-blue-800/50',
+  },
+  ALTA: {
+    label: 'Alta',
+    bg: 'bg-orange-50 dark:bg-orange-950/30',
+    text: 'text-orange-700 dark:text-orange-400',
+    border: 'border-orange-200 dark:border-orange-800/50',
+  },
+  URGENTE: {
+    label: 'Urgente',
+    bg: 'bg-red-50 dark:bg-red-950/30',
+    text: 'text-red-700 dark:text-red-400',
+    border: 'border-red-200 dark:border-red-800/50',
+  },
 }
 
 export const TIPO_EQUIPAMENTO = {
