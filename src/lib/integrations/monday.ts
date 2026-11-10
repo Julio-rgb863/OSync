@@ -1,7 +1,9 @@
 /**
  * OSync Enterprise — monday.com GraphQL API v2 Client
- * Integração nativa bidirecional para Work OS, Projetos e Tarefas
+ * Integração nativa bidirecional para Work OS, Projetos e Ordens de Serviço
  */
+
+import { prisma } from '@/lib/prisma'
 
 const MONDAY_API_URL = 'https://api.monday.com/v2'
 
@@ -22,7 +24,8 @@ export class MondayClient {
    * Executa uma consulta GraphQL na API v2 do monday.com
    */
   async query<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-    if (!this.token) {
+    const activeToken = this.token || process.env.MONDAY_API_TOKEN || ''
+    if (!activeToken) {
       throw new Error('Token do monday.com não configurado. Defina MONDAY_API_TOKEN no .env.')
     }
 
@@ -30,7 +33,7 @@ export class MondayClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: this.token.startsWith('Bearer ') ? this.token : this.token,
+        Authorization: activeToken,
         'API-Version': '2024-01',
       },
       body: JSON.stringify({ query, variables }),
@@ -84,7 +87,7 @@ export class MondayClient {
   }
 
   /**
-   * Cria um item no monday.com correspondente a uma Ordem de Serviço ou Projeto do OSync
+   * Cria um item no monday.com
    */
   async createItem(params: {
     boardId: string
@@ -117,7 +120,7 @@ export class MondayClient {
   }
 
   /**
-   * Atualiza o status ou colunas de um item no monday.com
+   * Atualiza as colunas de um item no monday.com
    */
   async updateItemColumns(params: {
     boardId: string
@@ -147,3 +150,94 @@ export class MondayClient {
 }
 
 export const mondayClient = new MondayClient()
+
+/**
+ * Mapeia status do OSync para o monday.com
+ */
+function mapStatusToMonday(status: string): string {
+  switch (status) {
+    case 'CONCLUIDA':
+    case 'ENTREGUE':
+      return 'Feito'
+    case 'EM_ANDAMENTO':
+    case 'AGUARDANDO_PECA':
+      return 'Trabalhando nisso'
+    case 'CANCELADA':
+      return 'Parado'
+    default:
+      return 'Pronto para iniciar'
+  }
+}
+
+/**
+ * Mapeia prioridade do OSync para o monday.com
+ */
+function mapPriorityToMonday(priority: string): string {
+  switch (priority) {
+    case 'URGENTE':
+      return 'Crítico'
+    case 'ALTA':
+      return 'Alto'
+    case 'BAIXA':
+      return 'Baixo'
+    default:
+      return 'Médio'
+  }
+}
+
+/**
+ * Sincroniza uma Ordem de Serviço com o quadro "Osync" no monday.com
+ */
+export async function syncOrdemServicoToMonday(osId: string): Promise<{ ok: boolean; mondayItemId?: string; error?: string }> {
+  try {
+    const boardId = process.env.MONDAY_BOARD_ID || '18439403289'
+    const ordem = await prisma.ordemDeServico.findUnique({
+      where: { id: osId },
+      include: { cliente: true, equipamento: true, tecnico: true },
+    })
+
+    if (!ordem) return { ok: false, error: 'OS não encontrada' }
+
+    const itemName = `OS #${String(ordem.numero).padStart(4, '0')} — ${ordem.cliente?.nome || 'Cliente'}`
+
+    // Monta valores das colunas de acordo com o quadro do monday.com
+    const columnValues: Record<string, unknown> = {
+      project_status: { label: mapStatusToMonday(ordem.status) },
+      priority_1: { label: mapPriorityToMonday(ordem.prioridade) },
+      numbers: ordem.valorTotal || 0,
+      text9: `${ordem.equipamento ? `${ordem.equipamento.marca || ''} ${ordem.equipamento.modelo || ''} - ` : ''}${ordem.descricaoProblema}`.slice(0, 255),
+    }
+
+    if (ordem.dataPrazo) {
+      columnValues.date = { date: ordem.dataPrazo.toISOString().split('T')[0] }
+    }
+
+    if (ordem.mondayItemId) {
+      // Atualiza item existente
+      await mondayClient.updateItemColumns({
+        boardId,
+        itemId: ordem.mondayItemId,
+        columnValues,
+      })
+      return { ok: true, mondayItemId: ordem.mondayItemId }
+    } else {
+      // Cria novo item no monday.com
+      const created = await mondayClient.createItem({
+        boardId,
+        itemName,
+        columnValues,
+      })
+
+      // Salva o mondayItemId no banco do OSync
+      await prisma.ordemDeServico.update({
+        where: { id: osId },
+        data: { mondayItemId: created.id },
+      })
+
+      return { ok: true, mondayItemId: created.id }
+    }
+  } catch (error: any) {
+    console.error('[monday.com sync error]:', error.message)
+    return { ok: false, error: error.message }
+  }
+}

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { syncOrdemServicoToMonday } from '@/lib/integrations/monday'
 
 export async function GET(req: Request) {
   const session = await auth()
@@ -51,5 +52,11 @@ export async function POST(req: Request) {
       observacao: 'Ordem de serviço criada',
     },
   })
+
+  // Sincroniza em segundo plano com monday.com
+  syncOrdemServicoToMonday(ordem.id).catch((e) =>
+    console.error('Falha ao sincronizar OS com monday.com:', e)
+  )
+
   return NextResponse.json(ordem, { status: 201 })
 }

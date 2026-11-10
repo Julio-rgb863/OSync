@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { syncOrdemServicoToMonday } from '@/lib/integrations/monday'
 
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await auth()
@@ -52,5 +53,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       },
     })
   }
+
+  // Sincroniza atualização com o monday.com
+  syncOrdemServicoToMonday(id).catch((e) =>
+    console.error('Falha ao sincronizar atualização com monday.com:', e)
+  )
+
   return NextResponse.json(ordem)
 }
