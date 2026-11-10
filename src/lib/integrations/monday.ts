@@ -160,12 +160,13 @@ function mapStatusToMonday(status: string): string {
     case 'ENTREGUE':
       return 'Feito'
     case 'EM_ANDAMENTO':
+      return 'Em andamento'
     case 'AGUARDANDO_PECA':
-      return 'Trabalhando nisso'
     case 'CANCELADA':
       return 'Parado'
+    case 'ABERTA':
     default:
-      return 'Pronto para iniciar'
+      return 'Não iniciado'
   }
 }
 
@@ -175,13 +176,14 @@ function mapStatusToMonday(status: string): string {
 function mapPriorityToMonday(priority: string): string {
   switch (priority) {
     case 'URGENTE':
-      return 'Crítico'
+      return 'Crítico ⚠️️'
     case 'ALTA':
-      return 'Alto'
+      return 'Alta'
     case 'BAIXA':
-      return 'Baixo'
+      return 'Baixa'
+    case 'MEDIA':
     default:
-      return 'Médio'
+      return 'Média'
   }
 }
 

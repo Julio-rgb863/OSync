@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:seed": "node --experimental-strip-types prisma/seed.ts",
     "db:studio": "prisma studio",
-    "db:reset": "prisma db push --force-reset && node --experimental-strip-types prisma/seed.ts"
+    "db:reset": "prisma db push --force-reset && node --experimental-strip-types prisma/seed.ts",
+    "monday:sync": "node scripts/sync-all-pending-monday.js"
   },
   "prisma": {
     "seed": "node --experimental-strip-types prisma/seed.ts"
