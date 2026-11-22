@@ -8,7 +8,7 @@ import { cn, ROLE_LABELS } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Monitor, FileText,
   Package, UserCog, Settings, ChevronLeft, ChevronRight,
-  LogOut, Shield, DollarSign,
+  LogOut, Shield, DollarSign, Truck,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { Logo } from '@/components/shared/logo'
@@ -39,6 +39,7 @@ const navSections: NavSection[] = [
     items: [
       { title: 'Equipamentos', href: '/equipamentos', icon: Monitor, roles: ['ADMIN', 'TECNICO', 'ATENDENTE'], shortcut: '⌘3' },
       { title: 'Peças & Estoque', href: '/pecas', icon: Package, roles: ['ADMIN', 'TECNICO'], shortcut: '⌘4' },
+      { title: 'Fornecedores', href: '/fornecedores', icon: Truck, roles: ['ADMIN', 'TECNICO'], shortcut: '⌘7' },
     ],
   },
   {

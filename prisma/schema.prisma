@@ -287,3 +287,58 @@ model TituloFinanceiro {
   organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   os           OrdemDeServico? @relation(fields: [osId], references: [id], onDelete: SetNull)
 }
+
+// ==========================================
+// ENTERPRISE ERP MODULES: COMPRAS & FORNECEDORES
+// ==========================================
+
+model Fornecedor {
+  id               String   @id @default(cuid())
+  razaoSocial      String
+  nomeFantasia     String?
+  cnpj             String?  @unique
+  email            String?
+  telefone         String?
+  categoria        String   @default("PECAS") // PECAS | EQUIPAMENTOS | SERVICOS | MATERIAIS
+  prazoEntregaDias Int      @default(3)
+  avaliacao        Float    @default(5.0)     // SLA 1.0 a 5.0
+  condicaoPagamento String?                   // Ex: "30 Dias", "À Vista", "Boleto 28D"
+  endereco         String?
+  cidade           String?
+  estado           String?
+  ativo            Boolean  @default(true)
+  observacoes      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  pedidos PedidoCompra[]
+}
+
+model PedidoCompra {
+  id                String    @id @default(cuid())
+  numero            Int       @unique
+  fornecedorId      String
+  status            String    @default("RASCUNHO") // RASCUNHO | COTACAO | APROVADO | ENVIADO | RECEBIDO | CANCELADO
+  valorTotal        Float     @default(0)
+  previsaoEntrega   DateTime?
+  dataEntrega       DateTime?
+  condicaoPagamento String?
+  observacoes       String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  fornecedor Fornecedor         @relation(fields: [fornecedorId], references: [id], onDelete: Cascade)
+  itens      ItemPedidoCompra[]
+}
+
+model ItemPedidoCompra {
+  id            String   @id @default(cuid())
+  pedidoId      String
+  descricao     String
+  pecaId        String?
+  quantidade    Int      @default(1)
+  valorUnitario Float    @default(0)
+  valorTotal    Float    @default(0)
+
+  pedido PedidoCompra @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+}

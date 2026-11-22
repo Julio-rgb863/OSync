@@ -421,6 +421,81 @@
           }
         }
       ]
+    },
+    {
+      "name": "8. Fornecedores & Suprimentos",
+      "item": [
+        {
+          "name": "Listar Fornecedores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fornecedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "fornecedores"]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Fornecedor",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razaoSocial\": \"Dell Computadores do Brasil Ltda\",\n  \"nomeFantasia\": \"Dell Brasil\",\n  \"cnpj\": \"72.381.189/0001-10\",\n  \"email\": \"contato@dell.com.br\",\n  \"telefone\": \"(11) 4004-0123\",\n  \"categoria\": \"PECAS\",\n  \"prazoEntregaDias\": 3,\n  \"avaliacao\": 4.9,\n  \"condicaoPagamento\": \"Boleto 30D\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/fornecedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "fornecedores"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Fornecedor",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"avaliacao\": 5.0,\n  \"prazoEntregaDias\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/fornecedores/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "fornecedores", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "fornecedor_id_aqui",
+                  "description": "ID do Fornecedor"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Desativar Fornecedor (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fornecedores/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "fornecedores", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "fornecedor_id_aqui",
+                  "description": "ID do Fornecedor a desativar"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }
