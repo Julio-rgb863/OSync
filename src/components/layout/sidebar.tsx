@@ -8,7 +8,7 @@ import { cn, ROLE_LABELS } from '@/lib/utils'
 import {
   LayoutDashboard, Users, Monitor, FileText,
   Package, UserCog, Settings, ChevronLeft, ChevronRight,
-  LogOut, Shield,
+  LogOut, Shield, DollarSign,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { Logo } from '@/components/shared/logo'
@@ -45,6 +45,12 @@ const navSections: NavSection[] = [
     heading: 'Comercial & CRM',
     items: [
       { title: 'Clientes', href: '/clientes', icon: Users, roles: ['ADMIN', 'TECNICO', 'ATENDENTE'], shortcut: '⌘5' },
+    ],
+  },
+  {
+    heading: 'Controladoria & Finanças',
+    items: [
+      { title: 'Financeiro', href: '/financeiro', icon: DollarSign, roles: ['ADMIN', 'TECNICO'], shortcut: '⌘6' },
     ],
   },
   {

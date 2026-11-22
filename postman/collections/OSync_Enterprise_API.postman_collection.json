@@ -1,0 +1,426 @@
+{
+  "info": {
+    "_postman_id": "a9b8c7d6-e5f4-4321-8765-abcdef012345",
+    "name": "OSync Enterprise ERP — API",
+    "description": "Coleção oficial de requisições para todos os módulos e endpoints do OSync Enterprise ERP.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Ordens de Serviço (OS)",
+      "item": [
+        {
+          "name": "Listar todas as OS",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ordens",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordens"]
+            }
+          }
+        },
+        {
+          "name": "Filtrar OS por Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ordens?status=ABERTA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordens"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ABERTA",
+                  "description": "ABERTA | EM_ANDAMENTO | AGUARDANDO_PECA | CONCLUIDA | ENTREGUE | CANCELADA"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Buscar OS por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ordens/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordens", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Criar Nova OS (Sincroniza com monday.com)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"clxxxxxxxxxx\",\n  \"equipamentoId\": null,\n  \"prioridade\": \"ALTA\",\n  \"descricaoProblema\": \"Aparelho não liga após descarga elétrica na fonte\",\n  \"dataPrazo\": \"2026-11-20T18:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ordens",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordens"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Status e Valores da OS",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"EM_ANDAMENTO\",\n  \"valorServico\": 180.00,\n  \"valorPecas\": 120.00,\n  \"valorTotal\": 300.00,\n  \"laudoTecnico\": \"Troca de capacitores e teste de estabilidade realizado.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ordens/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordens", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Adicionar Comentário na OS",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Cliente informado via WhatsApp sobre o orçamento atualizado.\",\n  \"interno\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ordens/:id/comentarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ordens", ":id", "comentarios"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Clientes",
+      "item": [
+        {
+          "name": "Listar Clientes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "Criar Cliente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tech Solutions Brasil Ltda\",\n  \"email\": \"contato@techsolutions.com.br\",\n  \"telefone\": \"(11) 98888-7777\",\n  \"cpfCnpj\": \"12.345.678/0001-90\",\n  \"endereco\": \"Av. Paulista, 1000 - Cj 50\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"SP\",\n  \"cep\": \"01310-100\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Cliente por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Cliente",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telefone\": \"(11) 99999-0000\",\n  \"observacoes\": \"Cliente prioritário do plano corporativo\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/clientes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "clientes", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Equipamentos",
+      "item": [
+        {
+          "name": "Listar Equipamentos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/equipamentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "equipamentos"]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Equipamento",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clienteId\": \"clxxxxxxxxxx\",\n  \"tipo\": \"NOTEBOOK\",\n  \"marca\": \"Dell\",\n  \"modelo\": \"Latitude 5420\",\n  \"numeroSerie\": \"DL5420-BR-9921\",\n  \"descricao\": \"Intel Core i7 16GB RAM 512GB SSD\",\n  \"acessorios\": \"Carregador original\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/equipamentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "equipamentos"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Equipamento",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"senha\": \"tech123\",\n  \"descricao\": \"Upgrade de RAM para 32GB realizado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/equipamentos/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "equipamentos", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Peças & Estoque",
+      "item": [
+        {
+          "name": "Listar Peças (com busca)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pecas?q=SSD",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pecas"],
+              "query": [{ "key": "q", "value": "SSD" }]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Nova Peça",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"SSD NVMe M.2 1TB Kingston NV2\",\n  \"codigo\": \"SKU-SSD-1TB-KNG\",\n  \"quantidade\": 15,\n  \"estoqueMinimo\": 5,\n  \"precoCompra\": 280.00,\n  \"precoVenda\": 450.00,\n  \"fornecedor\": \"Kingston Distribuidora\",\n  \"localizacao\": \"Prateleira B3\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pecas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pecas"]
+            }
+          }
+        },
+        {
+          "name": "Atualizar Peça",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantidade\": 20,\n  \"precoVenda\": 480.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pecas/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pecas", ":id"],
+              "variable": [{ "key": "id", "value": "" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Usuários & Gestão de Acesso",
+      "item": [
+        {
+          "name": "Listar Usuários (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        },
+        {
+          "name": "Criar Novo Usuário",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Carlos Oliveira\",\n  \"email\": \"carlos.tecnico@osync.com\",\n  \"password\": \"SenhaForte123\",\n  \"role\": \"TECNICO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/usuarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "usuarios"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Integração monday.com",
+      "item": [
+        {
+          "name": "Testar Conexão monday.com",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{mondayToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/integrations/monday",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "integrations", "monday"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Financeiro & Fluxo de Caixa",
+      "item": [
+        {
+          "name": "Listar Títulos e Resumo DRE / Fluxo de Caixa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financeiro",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "financeiro"]
+            }
+          }
+        },
+        {
+          "name": "Filtrar Títulos (Receitas Pendentes)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financeiro?tipo=RECEITA&status=PENDENTE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "financeiro"],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "RECEITA",
+                  "description": "RECEITA | DESPESA"
+                },
+                {
+                  "key": "status",
+                  "value": "PENDENTE",
+                  "description": "PENDENTE | PAGO | CANCELADO | ATRASADO"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Novo Lançamento Financeiro",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RECEITA\",\n  \"categoria\": \"SERVICOS\",\n  \"descricao\": \"Manutenção Preventiva - Servidores Matrix\",\n  \"valor\": 4500.00,\n  \"dataVencimento\": \"2026-11-30T00:00:00.000Z\",\n  \"formaPagamento\": \"PIX\",\n  \"documento\": \"NF-9841\",\n  \"observacoes\": \"Faturamento faturado direto ao cliente\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/financeiro",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "financeiro"]
+            }
+          }
+        },
+        {
+          "name": "Baixar Título (Liquidar como Pago)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PAGO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/financeiro/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "financeiro", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "titulo_id_aqui",
+                  "description": "ID do Título Financeiro a liquidar"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Excluir Título (Apenas Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/financeiro/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "financeiro", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "titulo_id_aqui",
+                  "description": "ID do Título a excluir"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

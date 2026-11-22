@@ -28,6 +28,7 @@
 .agents
 .claude
 .windsurf
+.postman
 skills-lock.json
 
 # debug

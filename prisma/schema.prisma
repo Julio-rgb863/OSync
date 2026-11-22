@@ -22,8 +22,10 @@ model User {
   ordens      OrdemDeServico[] @relation("TecnicoRelation")
   historicos  HistoricoOS[]
   comentarios ComentarioOS[]
+  titulos     TituloFinanceiro[]
   accounts    Account[]
   sessions    Session[]
+  memberships Membership[]
 }
 
 model Account {
@@ -129,6 +131,7 @@ model OrdemDeServico {
   pecas       PecaOS[]
   anexos      AnexoOS[]
   comentarios ComentarioOS[]
+  titulos     TituloFinanceiro[]
 }
 
 model HistoricoOS {
@@ -205,4 +208,82 @@ model AnexoEquipamento {
   createdAt     DateTime @default(now())
 
   equipamento Equipamento @relation(fields: [equipamentoId], references: [id], onDelete: Cascade)
+}
+
+
+// ==========================================
+// ENTERPRISE ERP MODULES: MULTI-TENANCY & AUDIT
+// ==========================================
+
+model Organization {
+  id        String   @id @default(cuid())
+  nome      String
+  cnpj      String?
+  slug      String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members    Membership[]
+  auditLogs  AuditLog[]
+  titulos    TituloFinanceiro[]
+}
+
+model Membership {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String   @default("MEMBER") // OWNER | ADMIN | MANAGER | MEMBER
+  permissions    String?  // JSON list of granular permissions
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String?
+  userId         String?
+  entity         String   // "OrdemDeServico" | "TituloFinanceiro" | "Cliente" | "Peca"
+  entityId       String
+  action         String   // "CREATE" | "UPDATE" | "DELETE" | "APPROVE" | "SYNC_MONDAY"
+  diffBefore     String?  // JSON snapshot anterior
+  diffAfter      String?  // JSON snapshot posterior
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+// ==========================================
+// ENTERPRISE ERP MODULES: FINANCEIRO & FISCAL
+// ==========================================
+
+model TituloFinanceiro {
+  id              String    @id @default(cuid())
+  organizationId  String?
+  tipo            String    // "RECEITA" | "DESPESA"
+  categoria       String    // "SERVICOS" | "PECAS" | "FORNECEDORES" | "FOLHA" | "INFRAESTRUTURA" | "OUTROS"
+  descricao       String
+  valor           Float
+  dataVencimento  DateTime
+  dataPagamento   DateTime?
+  status          String    @default("PENDENTE") // "PENDENTE" | "PAGO" | "CANCELADO" | "ATRASADO"
+  formaPagamento  String?   // "PIX" | "BOLETO" | "CARTAO" | "TRANSFERENCIA" | "DINHEIRO"
+  documento       String?   // Número da NF ou documento
+  osId            String?   // Vínculo com Ordem de Serviço
+  clienteId       String?
+  fornecedor      String?
+  observacoes     String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  usuarioId       String?
+  usuario         User?           @relation(fields: [usuarioId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  os           OrdemDeServico? @relation(fields: [osId], references: [id], onDelete: SetNull)
 }
